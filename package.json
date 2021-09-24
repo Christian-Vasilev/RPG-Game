@@ -1,0 +1,27 @@
+{
+  "name": "famr-game-v1",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "npm run prod",
+    "build": "npm-run-all clean transpile",
+    "app": "node ./src/server.js",
+    "dev": "nodemon --exec babel-node ./src/app.js",
+    "prod": "NODE_ENV=production npm-run-all build app",
+    "transpile": "babel ./src --out-dir build",
+    "clean": "rimraf ./build",
+    "watch:dev": "nodemon"
+  },
+  "author": "KristianVasilev",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.15.4",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.4",
+    "babel-cli": "^6.26.0",
+    "babel-preset-latest": "^6.24.1",
+    "nodemon": "^2.0.12"
+  }
+}

@@ -18,40 +18,11 @@ export default class Component {
         };
 
         this.dashAmount = this.config.dashAmount;
-
-
-        this.initEvents();
-    }
-
-    initEvents() {
-        let { keyStrokes } = this.config;
-
-        window.addEventListener('keydown', (e) => {
-            keyStrokes.add(e.key);
-            this.useDashAbility();
-        });
-
-        window.addEventListener('keyup', (e) => {
-            keyStrokes.delete(e.key);
-        });
+        this.hasAvailableDashes = Boolean(this.dashAmount);
     }
 
     decreaseDashAmount() {
-        if (this.dashAmount >= 0) {
-            this.dashAmount--;
-            let dashTimer = this.config.dashResetTimer * (this.config.dashAmount - this.dashAmount);
-
-            setTimeout(() => {
-                console.log('dash increase');
-                this.dashAmount++;
-            }, dashTimer)
-        }
-    }
-
-    useDashAbility() {
-        if (this.config.keyStrokes.has('Shift')) {
-            this.decreaseDashAmount();
-        }
+        this.dashAmount--;
     }
 
     resetIfOutOfBoundaries(x, y) {
@@ -93,21 +64,16 @@ export default class Component {
 
     update() {
         this.spawn();
-        this.movement();
+        this.walk();
 
         this.context.font = "30px Arial";
         this.context.fillText('Dash Amounts: ' + this.dashAmount, 50 , 50);
     }
 
     movement() {
-        let { maxSpeed, friction, keyStrokes } = this.config;
+        let { maxSpeed, friction } = this.config;
 
-        // Prevent from any logic from below being executed if no buttons are pressed
-        if (!keyStrokes.size) {
-            return;
-        }
-
-        let movement = {
+        return {
             'ArrowRight': {
                 updatePosition: () => {
                     if (this.config.velocityX < maxSpeed) {
@@ -152,34 +118,18 @@ export default class Component {
                     this.y += this.config.velocityY
                 }
             },
-            'Shift': {
-                updatePosition: () => {
-                    if (keyStrokes.has('Shift') && this.dashAmount >= 0) {
-                        let dashDistance = this.config.dashDistance;
-
-                        if (keyStrokes.size >= 3) {
-                            dashDistance = 1
-                        }
-
-                        if (keyStrokes.has('ArrowDown')) {
-                            this.y += this.config.velocityY + dashDistance
-                        }
-
-                        if (keyStrokes.has('ArrowUp')) {
-                            this.y += this.config.velocityY - dashDistance
-                        }
-
-                        if (keyStrokes.has('ArrowRight')) {
-                            this.x += this.config.velocityX + dashDistance
-                        }
-
-                        if (keyStrokes.has('ArrowLeft')) {
-                            this.x += this.config.velocityX - dashDistance
-                        }
-                    }
-                }
-            },
         }
+    }
+
+    walk() {
+        let { keyStrokes } = this.config;
+
+        // Prevent from any logic from below being executed if no buttons are pressed
+        if (!keyStrokes.size) {
+            return;
+        }
+
+        let movement = this.movement();
 
         keyStrokes.forEach((keyStroke) => {
             if (movement.hasOwnProperty(keyStroke)) {

@@ -55,9 +55,6 @@ export default class GameEngine {
             timeToNextRender = 0;
         }
 
-
-        this.deltaTime = deltaTime / (this.gameConfig.frameDuration);
-
         let actualFps = 1000 / deltaTime;
         // console.log(
         //     'Actual FPS: ' + actualFps,
@@ -73,7 +70,7 @@ export default class GameEngine {
         this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
         // this.healthBar.show(this.uiContext);
 
-        this.character.update(this.deltaTime);
+        this.character.update();
     }
 }
 

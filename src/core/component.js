@@ -21,10 +21,6 @@ export default class Component {
         this.hasAvailableDashes = Boolean(this.dashAmount);
     }
 
-    decreaseDashAmount() {
-        this.dashAmount--;
-    }
-
     resetIfOutOfBoundaries(x, y) {
         let leftBoundaries = this.context.canvas.height - this.height;
         let rightBoundaries = this.context.canvas.width - this.width;

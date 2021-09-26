@@ -1,4 +1,4 @@
-export default class Component {
+export default class Entity {
     constructor(context, width, height, color, x, y) {
         this.context = context;
         this.width = width;
@@ -11,12 +11,20 @@ export default class Component {
             velocityY: 0,
             maxSpeed: 5,
             friction: 0.98,
-            dashDistance: 5,
+            dashDistance: 50,
             dashAmount: 3,
+            rotation: 0,
+            timeBetweenDashes: 1.5,
             dashResetTimer:  3 * 1000,
             keyStrokes: new Set(),
         };
 
+        this.rotation = this.config.rotation;
+
+        this.mouseCoordinates = {
+            mouseX: this.config.x,
+            mouseY: this.config.y,
+        }
         this.dashAmount = this.config.dashAmount;
         this.hasAvailableDashes = Boolean(this.dashAmount);
     }
@@ -46,20 +54,37 @@ export default class Component {
         }
     }
 
-    spawn() {
-        this.context.fillStyle = this.color;
-        this.context.fillRect(this.x, this.y, this.width, this.height);
-    }
-
     draw(x, y) {
+        this.context.save();
+        let translateX = this.x + 0.5 * this.width
+        let translateY = this.y + 0.5 * this.height
+
         this.context.beginPath();
-        this.context.rect(x, y, this.width, this.height);
+
+        // Set rotation to the center of the rect.
+        this.context.translate(
+            translateX,
+            translateY
+        );
+
+        this.context.rotate(this.rotation);
+
+        // Reset canvas rotation
+        this.context.translate(
+            -translateX,
+            -translateY
+        );
+
         this.context.fillStyle = this.color;
+        this.context.rect(x, y, this.width, this.height);
         this.context.fill();
+        this.context.closePath();
+
+        this.context.restore();
     }
 
     update() {
-        this.spawn();
+        this.draw(this.x, this.y);
         this.walk();
 
         this.context.font = "30px Arial";
@@ -70,7 +95,7 @@ export default class Component {
         let { maxSpeed, friction } = this.config;
 
         return {
-            'ArrowRight': {
+            'D': {
                 updatePosition: () => {
                     if (this.config.velocityX < maxSpeed) {
                         this.config.velocityX++;
@@ -81,7 +106,7 @@ export default class Component {
                     this.x += this.config.velocityX
                 }
             },
-            'ArrowLeft': {
+            'A': {
                 updatePosition: () => {
                     if (this.config.velocityX > -maxSpeed) {
                         this.config.velocityX--;
@@ -92,7 +117,7 @@ export default class Component {
                     this.x += this.config.velocityX
                 }
             },
-            'ArrowUp': {
+            'W': {
                 updatePosition: () => {
                     if (this.config.velocityY > -maxSpeed && this.y > 0) {
                         this.config.velocityY--;
@@ -103,7 +128,7 @@ export default class Component {
                     this.y += this.config.velocityY
                 }
             },
-            'ArrowDown': {
+            'S': {
                 updatePosition: () => {
                     if (this.config.velocityY < maxSpeed) {
                         this.config.velocityY++;
@@ -119,7 +144,7 @@ export default class Component {
 
     walk() {
         let { keyStrokes } = this.config;
-
+        console.log(keyStrokes);
         // Prevent from any logic from below being executed if no buttons are pressed
         if (!keyStrokes.size) {
             return;
@@ -132,8 +157,6 @@ export default class Component {
                 let { updatePosition } = movement[keyStroke];
                 updatePosition();
                 this.resetIfOutOfBoundaries(this.x, this.y);
-
-                this.draw(this.x, this.y);
             }
         });
     }

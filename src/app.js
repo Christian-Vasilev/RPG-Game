@@ -1,8 +1,8 @@
-import GameEngine from './core/game-engine.js';
+import GamEngine from './core/gamEngine.js';
 
 export default class Game {
     constructor() {
-        this.engine = new GameEngine();
+        this.engine = new GamEngine();
     }
 
     animate() {

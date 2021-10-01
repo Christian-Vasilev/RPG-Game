@@ -1,20 +1,32 @@
 import GridSystem from './gridSystem.js';
 import HealthBar from "./player/health-bar.js";
 import Character from "./player/character.js";
-import Manager from "./system/manager.js";
-import Position from "./components/Position.js";
+import Manager from "./manager.js";
+import Position from "./components/position.js";
+import PositionSystem from "./systems/position.js";
+import World from "./world.js";
+import Renderable from "./components/renderable.js";
+import RenderableSystem from "./systems/renderable.js";
 let timeToNextRender = 0;
 let lastTime = 0;
 
 export default class GamEngine {
     constructor() {
-        // Component Entity Based System
-        const manager = new Manager();
-        let playerEntityId = manager.createEntity([new Position(20, 30)])
+        // Create a new world instance
+        const gameWorld = new World();
+        // Get the world manager
+        const gameWorldManager = gameWorld.getManager();
+        // Add a system to the world manager
+        gameWorldManager.registerSystem(new PositionSystem());
+        gameWorldManager.registerSystem(new RenderableSystem());
 
-        let playerEntity = manager.getEntity(playerEntityId);
+        // Add a player Entity to the world manager.
+        let playerEntityId = gameWorldManager.createEntity([
+            new Position(20, 30, 0),
+            new Renderable('#FFFFFF')
+        ]);
 
-        console.log(playerEntity);
+        console.log(gameWorld);
 
         return;
         this.gridSystem = new GridSystem();

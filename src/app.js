@@ -1,4 +1,4 @@
-import GamEngine from './core/gamEngine.js';
+import GamEngine from './core/GamEngine.js';
 
 export default class Game {
     constructor() {

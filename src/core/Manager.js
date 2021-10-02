@@ -28,13 +28,25 @@ export default class Manager {
     createEntity(components) {
         const id = (new Date().getTime()) & 0xffffffff; // Generate random 32 bit integer
 
+        // Collect all systems that are in use of this entity
+        let systems = [];
+        // Foreach components in the entity and find the systems that are responsible for them.
         components.forEach((component) => {
-            let systems = this.syncEntityComponentWithSystems(id, component);
-
-            let entity = this.getEntity(id);
-            this.#entities.set(id, [...entity, ...systems]);
+            // Push the responsible systems for the component in the array of systems
+            systems.push(...this.syncEntityComponentWithSystems(id, component));
         });
 
+        // Filter all systems and leave only the unique to attach them to the entity
+        const uniqueSystems = systems.filter((item, index) => {
+            return systems.indexOf(item) === index;
+        });
+
+        // Get current entity data
+        let entity = this.getEntity(id);
+        // Merge the unique systems for this entity with the previously added (if there are any)
+        this.#entities.set(id, [...entity, ...uniqueSystems]);
+
+        // Return the entity id.
         return id;
     }
 
@@ -47,22 +59,22 @@ export default class Manager {
      * @param component
      */
     syncEntityComponentWithSystems(entityId, component) {
+        // Systems responsible for this component
         let entityIncludedSystems = [];
 
         this.#systems.forEach((system) => {
-            // Check if the system components includes the entity component name
             let componentName = component.constructor.name;
+
+            // Check if the system components includes the entity component name
             if (system.getComponents().includes(componentName)) {
-                // If the Entity component name is included in this system - SYNC.
+                // If the Entity component name is included in this system - Attach.
                 system.setEntity(entityId, component);
-                if (entityIncludedSystems.indexOf(system) === -1) {
-                    entityIncludedSystems.push(system);
-                }
+                // Add the system to the array of systems responsible for this component
+                entityIncludedSystems.push(system);
             }
         });
 
-        console.log(entityIncludedSystems);
-
+        // Return all responsible systems for this component
         return entityIncludedSystems;
     }
 

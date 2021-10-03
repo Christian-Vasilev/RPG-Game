@@ -1,42 +1,57 @@
 import System from "./System.js";
 
+const renderable = 'Renderable';
+const position = 'Position';
+
 export default class Renderable extends System {
-    constructor(width, height, color, context) {
+    constructor(context) {
         super();
-        this.state = {
-            width,
-            height,
-            color
-        }
 
         this.context = context;
         this.name = 'Renderable';
     }
 
     getComponents() {
-        return ['Position'];
+        return [position, renderable];
     }
 
     execute() {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
 
         this.getEntities().forEach((components, entityId) => {
-            components.forEach((component) => {
-                let { x, y }= component.state;
-                this.render(x, y);
-            })
+            let { width, height, color } = this.getComponent(entityId, renderable).state;
+            let { x, y, rotation } = this.getComponent(entityId, position).state;
+
+            this.render(x, y, rotation, width, height, color);
         });
-
-
     }
 
-    render(x, y ) {
+    render(x, y, rotation, width, height, color) {
         this.context.save(x, y);
+
+        // Translate element
+        let translateX = x + 0.5 * width
+        let translateY = y + 0.5 * height
+
+        // Rotate element with translation
+        this.context.translate(
+            translateX,
+            translateY
+        );
+
+        this.context.rotate(rotation);
+
+        // Reset canvas rotation
+        this.context.translate(
+            -translateX,
+            -translateY
+        );
+
 
         this.context.beginPath();
 
-        this.context.fillStyle = this.state.color;
-        this.context.rect(x, y, this.state.width, this.state.height);
+        this.context.fillStyle = color;
+        this.context.rect(x, y, width, height);
         this.context.fill();
 
         this.context.closePath();

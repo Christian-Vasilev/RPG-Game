@@ -37,7 +37,14 @@ export default class System {
      * @param {*} entityId
      * @param {string} componentName
      */
-    systemHasComponent(entityId, componentName) {
+    hasComponent(entityId, componentName) {
         return this.getEntity(entityId).findIndex(component => component.name === componentName) !== -1;
     }
+
+    getComponent(entityId, componentName) {
+        let entity = this.getEntity(entityId);
+        return entity[entity.findIndex(component => component.name === componentName)];
+    }
+
+
 }

@@ -3,11 +3,13 @@ import HealthBar from "./player/health-bar.js";
 import Character from "./player/character.js";
 import Manager from "./Manager.js";
 import Position from "./components/Position.js";
-import PositionSystem from "./systems/Position.js";
 import World from "./World.js";
 import RenderableSystem from "./systems/Renderable.js";
 import PlayerControlled from "./components/PlayerControlled.js";
-import Renderable from "./systems/Renderable.js";
+import Movement from "./components/Movement.js";
+import MovementSystem from "./systems/Movement.js";
+import Renderable from "./components/Renderable.js";
+import Rotation from "./components/Rotation.js";
 
 let lastFpsUpdate = 0;
 let lastTime = 0;
@@ -29,18 +31,16 @@ export default class GamEngine {
             frameDuration: 1000 / 60,
         }
 
-        this.#gameWorldManager.registerSystem(new PositionSystem());
-        this.#gameWorldManager.registerSystem(new RenderableSystem(
-            32,
-            32,
-            '#FFFFFF',
-            this.#gameWorld.getContext()
-        ));
+        this.#gameWorldManager.registerSystem(new MovementSystem());
+        this.#gameWorldManager.registerSystem(new RenderableSystem(this.#gameWorld.getContext()));
 
         // Add a player Entity to the world manager.
         this.#gameWorldManager.createEntity([
-            new Position(150, 130, 0),
             new PlayerControlled(),
+            new Movement(10, 0.9, 0, 0, 0),
+            new Rotation(0, 0),
+            new Position(150, 130, 0),
+            new Renderable(32, 32, '#FFFFFF')
         ]);
 
 

@@ -20,7 +20,9 @@ export default class World {
 
         const systems = this.#manager.getSystems();
         systems.forEach((system) => {
-            system.execute();
+            system.getEntities().forEach((entityId) => {
+                system.execute(this.#manager.getEntity(entityId));
+            })
         });
     }
 

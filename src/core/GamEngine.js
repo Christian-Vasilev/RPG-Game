@@ -31,13 +31,15 @@ export default class GamEngine {
             frameDuration: 1000 / 60,
         }
 
-        this.#gameWorldManager.registerSystem(new MovementSystem());
-        this.#gameWorldManager.registerSystem(new RenderableSystem(this.#gameWorld.getContext()));
+        this.#gameWorldManager.registerSystems([
+            new MovementSystem(),
+            new RenderableSystem(this.#gameWorld.getContext())
+        ]);
 
         // Add a player Entity to the world manager.
         this.#gameWorldManager.createEntity([
             new PlayerControlled(),
-            new Movement(10, 0.9, 0, 0, 0),
+            new Movement(4, 0.9, 0, 0, 0),
             new Rotation(0, 0),
             new Position(150, 130, 0),
             new Renderable(32, 32, '#FFFFFF')

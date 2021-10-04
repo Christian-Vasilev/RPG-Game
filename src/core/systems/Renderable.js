@@ -15,15 +15,11 @@ export default class Renderable extends System {
         return [position, renderable];
     }
 
-    execute() {
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+    execute(components) {
+        let { width, height, color } = this.getComponent(components, renderable).state;
+        let { x, y, rotation } = this.getComponent(components, position).state;
 
-        this.getEntities().forEach((components, entityId) => {
-            let { width, height, color } = this.getComponent(entityId, renderable).state;
-            let { x, y, rotation } = this.getComponent(entityId, position).state;
-
-            this.render(x, y, rotation, width, height, color);
-        });
+        this.render(x, y, rotation, width, height, color);
     }
 
     render(x, y, rotation, width, height, color) {
@@ -46,7 +42,6 @@ export default class Renderable extends System {
             -translateX,
             -translateY
         );
-
 
         this.context.beginPath();
 

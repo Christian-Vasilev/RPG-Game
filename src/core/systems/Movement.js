@@ -37,43 +37,41 @@ export default class Movement extends System {
         return [playerControlled, movement, rotation, position];
     }
 
-    execute() {
-        this.getEntities().forEach((components, entityId) => {
-            let isControlledByPlayer = this.hasComponent(entityId, playerControlled);
+    execute(components) {
+        let isControlledByPlayer = this.hasComponent(components, playerControlled);
 
-            if (isControlledByPlayer) {
-                let movementComponent = this.getComponent(entityId, movement);
-                let rotationComponent = this.getComponent(entityId, rotation);
-                let positionComponent = this.getComponent(entityId, position);
-                let playerMovement = this.movePlayer(movementComponent);
+        if (isControlledByPlayer) {
+            let movementComponent = this.getComponent(components, movement);
+            let rotationComponent = this.getComponent(components, rotation);
+            let positionComponent = this.getComponent(components, position);
+            let playerMovement = this.movePlayer(movementComponent);
 
-                let { x, y } = positionComponent.state;
+            let { x, y } = positionComponent.state;
 
-                // Calculate rotation of the player
-                let calculateRotationDegrees = Math.atan2(
-                    this.clientY - y,
-                    this.clientX - x + (Math.PI / 2)
-                );
+            // Calculate rotation of the player
+            let calculateRotationDegrees = Math.atan2(
+                this.clientY - y,
+                this.clientX - x + (Math.PI / 2)
+            );
 
-                // Update Components state
-                rotationComponent.state = {
-                    clientX: this.clientX,
-                    clientY: this.clientY
-                }
-
-                // Update Movement component
-                movementComponent.state = playerMovement;
-
-                // Update Position component
-                positionComponent.state = {
-                    x: x + playerMovement.velocityX,
-                    y: y + playerMovement.velocityY,
-                    rotation: calculateRotationDegrees
-                }
-            } else {
-                this.moveAi();
+            // Update Components state
+            rotationComponent.state = {
+                clientX: this.clientX,
+                clientY: this.clientY
             }
-        });
+
+            // Update Movement component
+            movementComponent.state = playerMovement;
+
+            // Update Position component
+            positionComponent.state = {
+                x: x + playerMovement.velocityX,
+                y: y + playerMovement.velocityY,
+                rotation: calculateRotationDegrees
+            }
+        } else {
+            this.moveAi();
+        }
     }
 
     movePlayer(component) {

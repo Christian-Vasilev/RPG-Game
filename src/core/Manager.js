@@ -28,54 +28,13 @@ export default class Manager {
     createEntity(components) {
         const id = (new Date().getTime()) & 0xffffffff; // Generate random 32 bit integer
 
-        // Collect all systems that are in use of this entity
-        let systems = [];
-        // Foreach components in the entity and find the systems that are responsible for them.
+        this.#entities.set(id, components);
+
         components.forEach((component) => {
-            // Push the responsible systems for the component in the array of systems
-            systems.push(...this.syncEntityComponentWithSystems(id, component));
+            this.addEntityToSystem(id, component)
         });
 
-        // Filter all systems and leave only the unique to attach them to the entity
-        const uniqueSystems = systems.filter((item, index) => {
-            return systems.indexOf(item) === index;
-        });
-
-        // Get current entity data
-        let entity = this.getEntity(id);
-        // Merge the unique systems for this entity with the previously added (if there are any)
-        this.#entities.set(id, [...entity, ...uniqueSystems]);
-
-        // Return the entity id.
         return id;
-    }
-
-    /**
-     *
-     * Attaches a entity and component to a system. This will increase the performance
-     * later on when we update the system, since it will iterate only over the components
-     * of the system.
-     * @param entityId
-     * @param component
-     */
-    syncEntityComponentWithSystems(entityId, component) {
-        // Systems responsible for this component
-        let entityIncludedSystems = [];
-
-        this.#systems.forEach((system) => {
-            let componentName = component.constructor.name;
-
-            // Check if the system components includes the entity component name
-            if (system.getComponents().includes(componentName)) {
-                // If the Entity component name is included in this system - Attach.
-                system.setEntity(entityId, component);
-                // Add the system to the array of systems responsible for this component
-                entityIncludedSystems.push(system);
-            }
-        });
-
-        // Return all responsible systems for this component
-        return entityIncludedSystems;
     }
 
     /**
@@ -93,19 +52,27 @@ export default class Manager {
         return [];
     }
 
+    getEntities() {
+        return this.#entities;
+    }
+
     /**
      *
-     * @desc Adds a component to already existing entity
+     * @desc Adds a entity to the system
      * @param entityId
      * @param component
      * @returns {boolean}
      */
-    addComponent(entityId, component) {
+    addEntityToSystem(entityId, component) {
         if (!this.#entities.has(entityId)) {
             throw new Error(`There is no entity with id ${entityId}`);
         }
 
-        this.syncEntityComponentWithSystems(entityId, component);
+        this.#systems.forEach((system) => {
+            if (!system.hasEntity(entityId)) {
+                system.addEntity(entityId);
+            }
+        })
 
         return true;
     }

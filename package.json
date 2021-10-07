@@ -2,26 +2,31 @@
   "name": "famr-game-v1",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
-  "main": "src/app.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "npm run prod",
-    "build": "npm-run-all clean transpile",
-    "app": "node ./src/server.js",
-    "dev": "nodemon --exec babel-node ./src/app.js",
-    "prod": "NODE_ENV=production npm-run-all build app",
-    "transpile": "babel ./src --out-dir build",
-    "clean": "rimraf ./build",
-    "watch:dev": "nodemon"
+    "build-for-windows": "SET NODE_ENV='production' && webpack",
+    "build": "NODE_ENV='production' webpack",
+    "start": "webpack-dev-server"
   },
   "author": "KristianVasilev",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.15.4",
-    "@babel/core": "^7.15.5",
-    "@babel/preset-env": "^7.15.4",
+    "@babel/core": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
     "babel-cli": "^6.26.0",
-    "babel-preset-latest": "^6.24.1",
-    "nodemon": "^2.0.12"
+    "babel-loader": "^8.0.6",
+    "babel-preset-latest": "^1.0.0",
+    "copy-webpack-plugin": "^9.0.1",
+    "css-loader": "^6.3.0",
+    "html-webpack-plugin": "^5.3.2",
+    "nodemon": "^2.0.12",
+    "style-loader": "^3.3.0",
+    "webpack": "^5.57.1",
+    "webpack-cli": "^4.9.0",
+    "webpack-dev-server": "^4.3.1"
+  },
+  "dependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3"
   }
 }

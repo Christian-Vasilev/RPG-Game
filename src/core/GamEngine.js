@@ -10,10 +10,11 @@ import Movement from "./components/Movement.js";
 import MovementSystem from "./systems/Movement.js";
 import Renderable from "./components/Renderable.js";
 import Rotation from "./components/Rotation.js";
+import Dash from "./components/Dash.js";
+import DashingSystem from "./systems/Dashing.js";
+import UserInterface from "./systems/UserInterface.js";
 
 let lastFpsUpdate = 0;
-let lastTime = 0;
-let timeToNextRender = 0;
 let framesThisSecond = 0;
 let deltaTime = 0;
 let fps = 0;
@@ -33,7 +34,9 @@ export default class GamEngine {
 
         this.#gameWorldManager.registerSystems([
             new MovementSystem(),
-            new RenderableSystem(this.#gameWorld.getContext())
+            new DashingSystem(),
+            new RenderableSystem(this.#gameWorld.getContext()),
+            new UserInterface(this.#gameWorld.getContext())
         ]);
 
         // Add a player Entity to the world manager.
@@ -41,6 +44,7 @@ export default class GamEngine {
             new PlayerControlled(),
             new Movement(4, 0.9, 0, 0, 0),
             new Rotation(0, 0),
+            new Dash(3, 50, 1.5, 3 * 1000),
             new Position(150, 130, 0),
             new Renderable(32, 32, '#FFFFFF')
         ]);
@@ -84,7 +88,7 @@ export default class GamEngine {
 
         let numUpdateSteps = 0;
         while (deltaTime >= timeStep) {
-            this.#gameWorld.execute(timeStep);
+            this.#gameWorld.execute();
             deltaTime -= timeStep;
             if (++numUpdateSteps >= 240) {
                 deltaTime = 0;

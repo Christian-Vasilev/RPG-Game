@@ -87,8 +87,7 @@ export default class Entity {
         this.draw(this.x, this.y);
         this.walk();
 
-        this.context.font = "30px Arial";
-        this.context.fillText('Dash Amounts: ' + this.dashAmount, 50 , 50);
+
     }
 
     movement() {

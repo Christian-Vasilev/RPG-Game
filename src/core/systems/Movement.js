@@ -19,6 +19,9 @@ export default class Movement extends System {
     initEvents() {
         let keyStrokes = this.keyStrokes;
 
+
+        // TODO: Find a fix for this to work eve in CO-OP. Right now works only for 1 player
+        // Since we keep the coordinates on the system instance.
         window.addEventListener('mousemove', (e) => {
             this.clientX = e.clientX;
             this.clientY = e.clientY;
@@ -63,6 +66,7 @@ export default class Movement extends System {
             // Update Movement component
             movementComponent.state = playerMovement;
 
+            console.log(playerMovement);
             // Update Position component
             positionComponent.state = {
                 x: x + playerMovement.velocityX,

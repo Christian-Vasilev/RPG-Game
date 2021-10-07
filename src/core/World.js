@@ -21,7 +21,11 @@ export default class World {
         const systems = this.#manager.getSystems();
         systems.forEach((system) => {
             system.getEntities().forEach((entityId) => {
-                system.execute(this.#manager.getEntity(entityId));
+                let components = this.#manager.getEntity(entityId).filter((item) => {
+                    return system.getComponents().includes(item.name);
+                });
+
+                system.execute(components);
             })
         });
     }

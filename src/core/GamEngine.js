@@ -32,11 +32,13 @@ export default class GamEngine {
             frameDuration: 1000 / 60,
         }
 
+        const context = this.#gameWorld.getContext()
+
         this.#gameWorldManager.registerSystems([
-            new MovementSystem(),
+            new MovementSystem(context.canvas.height, context.canvas.width),
             new DashingSystem(),
-            new RenderableSystem(this.#gameWorld.getContext()),
-            new UserInterface(this.#gameWorld.getContext())
+            new RenderableSystem(context),
+            new UserInterface(context)
         ]);
 
         // Add a player Entity to the world manager.

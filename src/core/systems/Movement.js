@@ -6,10 +6,12 @@ const rotation = 'Rotation';
 const position = 'Position';
 
 export default class Movement extends System {
-    constructor() {
+    constructor(leftBoundaries, rightBoundaries) {
         super();
 
         this.name = 'Movement';
+        this.leftBoundaries = leftBoundaries;
+        this.rightBoundaries = rightBoundaries;
         this.clientX = 0;
         this.clientY = 0;
         this.keyStrokes = new Set();
@@ -18,7 +20,6 @@ export default class Movement extends System {
 
     initEvents() {
         let keyStrokes = this.keyStrokes;
-
 
         // TODO: Find a fix for this to work eve in CO-OP. Right now works only for 1 player
         // Since we keep the coordinates on the system instance.
@@ -66,11 +67,19 @@ export default class Movement extends System {
             // Update Movement component
             movementComponent.state = playerMovement;
 
-            console.log(playerMovement);
+            let { posX, posY, velocityX, velocityY } = this.resetIfOutOfBoundaries(
+                x,
+                y,
+                32,
+                32,
+                playerMovement.velocityY,
+                playerMovement.velocityX
+            );
+
             // Update Position component
             positionComponent.state = {
-                x: x + playerMovement.velocityX,
-                y: y + playerMovement.velocityY,
+                x: posX + velocityX,
+                y: posY + velocityY,
                 rotation: calculateRotationDegrees
             }
         } else {
@@ -93,6 +102,12 @@ export default class Movement extends System {
                 }
             };
         }
+
+        // Reset velocities if there is no diagonal movement
+        this.keyStrokes.has('W') && this.keyStrokes.size < 2 && (velocityX = 0);
+        this.keyStrokes.has('S') && this.keyStrokes.size < 2 && (velocityX = 0);
+        this.keyStrokes.has('A') && this.keyStrokes.size < 2 && (velocityY = 0);
+        this.keyStrokes.has('D') && this.keyStrokes.size < 2 && (velocityY = 0);
 
         if (this.keyStrokes.has('W')) {
             if (velocityY > -maxSpeed) {
@@ -136,6 +151,38 @@ export default class Movement extends System {
                 clientY: this.clientY
             }
         };
+    }
+
+    resetIfOutOfBoundaries(posX, posY, width, height, velocityY, velocityX) {
+        let leftBoundaries = this.leftBoundaries - height;
+        let rightBoundaries = this.rightBoundaries - width;
+
+        if (posY < 0) {
+            posY = 0;
+            velocityY = 0;
+        }
+
+        if (posY >= leftBoundaries) {
+            posY = leftBoundaries;
+            velocityY = 0;
+        }
+
+        if (posX < 0) {
+            posX = 0;
+            velocityX = 0;
+        }
+
+        if (posX >= rightBoundaries) {
+            posX = rightBoundaries;
+            velocityX = 0;
+        }
+
+        return {
+            posX,
+            posY,
+            velocityY,
+            velocityX
+        }
     }
 
     moveAi() {

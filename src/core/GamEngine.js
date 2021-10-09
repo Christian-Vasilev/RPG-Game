@@ -6,9 +6,11 @@ import Position from "./components/Position.js";
 import World from "./World.js";
 import RenderableSystem from "./systems/Renderable.js";
 import PlayerControlled from "./components/PlayerControlled.js";
+import Collision from "./components/Collision.js";
 import Movement from "./components/Movement.js";
 import MovementSystem from "./systems/Movement.js";
 import Renderable from "./components/Renderable.js";
+import CollisionSystem from "./systems/Collision.js";
 import Rotation from "./components/Rotation.js";
 import Dash from "./components/Dash.js";
 import DashingSystem from "./systems/Dashing.js";
@@ -35,8 +37,9 @@ export default class GamEngine {
         const context = this.#gameWorld.getContext()
 
         this.#gameWorldManager.registerSystems([
-            new MovementSystem(context.canvas.height, context.canvas.width),
+            new MovementSystem(),
             new DashingSystem(),
+            new CollisionSystem(),
             new RenderableSystem(context),
             new UserInterface(context)
         ]);
@@ -48,6 +51,7 @@ export default class GamEngine {
             new Rotation(0, 0),
             new Dash(3, 50, 1.5, 3 * 1000),
             new Position(150, 130, 0),
+            new Collision(0, context.canvas.width - 32, 0, context.canvas.height - 32),
             new Renderable(32, 32, '#FFFFFF')
         ]);
 

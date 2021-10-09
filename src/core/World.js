@@ -12,7 +12,7 @@ export default class World {
         this.canvas = null;
         this.context = null;
 
-        this.initCanvas(window.innerWidth, window.innerHeight, '#464047');
+        this.initCanvas(window.innerWidth / 2, window.innerHeight / 2, '#464047');
     }
 
     execute() {

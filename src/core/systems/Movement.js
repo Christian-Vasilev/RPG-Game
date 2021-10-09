@@ -4,14 +4,13 @@ const movement = 'Movement';
 const playerControlled = 'PlayerControlled';
 const rotation = 'Rotation';
 const position = 'Position';
+const collision = 'Collision';
 
 export default class Movement extends System {
     constructor(leftBoundaries, rightBoundaries) {
         super();
 
         this.name = 'Movement';
-        this.leftBoundaries = leftBoundaries;
-        this.rightBoundaries = rightBoundaries;
         this.clientX = 0;
         this.clientY = 0;
         this.keyStrokes = new Set();
@@ -38,7 +37,7 @@ export default class Movement extends System {
     }
 
     getComponents() {
-        return [playerControlled, movement, rotation, position];
+        return [playerControlled, movement, rotation, position, collision];
     }
 
     execute(components) {
@@ -48,8 +47,10 @@ export default class Movement extends System {
             let movementComponent = this.getComponent(components, movement);
             let rotationComponent = this.getComponent(components, rotation);
             let positionComponent = this.getComponent(components, position);
+            let collisionComponent = this.getComponent(components, collision);
             let playerMovement = this.movePlayer(movementComponent);
 
+            let { isColliding, resetPositionOnCollide } = collisionComponent.state;
             let { x, y } = positionComponent.state;
 
             // Calculate rotation of the player
@@ -67,19 +68,10 @@ export default class Movement extends System {
             // Update Movement component
             movementComponent.state = playerMovement;
 
-            let { posX, posY, velocityX, velocityY } = this.resetIfOutOfBoundaries(
-                x,
-                y,
-                32,
-                32,
-                playerMovement.velocityY,
-                playerMovement.velocityX
-            );
-
             // Update Position component
             positionComponent.state = {
-                x: posX + velocityX,
-                y: posY + velocityY,
+                x: isColliding ? resetPositionOnCollide.posX : x + playerMovement.velocityX,
+                y: isColliding ? resetPositionOnCollide.posY : y + playerMovement.velocityY,
                 rotation: calculateRotationDegrees
             }
         } else {
@@ -151,38 +143,6 @@ export default class Movement extends System {
                 clientY: this.clientY
             }
         };
-    }
-
-    resetIfOutOfBoundaries(posX, posY, width, height, velocityY, velocityX) {
-        let leftBoundaries = this.leftBoundaries - height;
-        let rightBoundaries = this.rightBoundaries - width;
-
-        if (posY < 0) {
-            posY = 0;
-            velocityY = 0;
-        }
-
-        if (posY >= leftBoundaries) {
-            posY = leftBoundaries;
-            velocityY = 0;
-        }
-
-        if (posX < 0) {
-            posX = 0;
-            velocityX = 0;
-        }
-
-        if (posX >= rightBoundaries) {
-            posX = rightBoundaries;
-            velocityX = 0;
-        }
-
-        return {
-            posX,
-            posY,
-            velocityY,
-            velocityX
-        }
     }
 
     moveAi() {

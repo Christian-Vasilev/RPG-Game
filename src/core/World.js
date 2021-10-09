@@ -32,6 +32,7 @@ export default class World {
 
     initCanvas(width, height, color) {
         this.canvas = document.createElement('canvas');
+``        this.canvas.id = 'game';
         this.context = this.canvas.getContext('2d');
         this.canvas.width = width;
         this.canvas.height = height;

@@ -1,4 +1,5 @@
 import GamEngine from './core/GamEngine.js';
+import css from "./css/style.css";
 
 export default class Game {
     constructor() {
@@ -12,5 +13,6 @@ export default class Game {
 
 const game = new Game();
 game.animate();
+
 
 
